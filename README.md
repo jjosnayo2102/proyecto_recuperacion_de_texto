@@ -1,5 +1,6 @@
 ﻿# proyecto_recuperacion_de_texto
  Para la interfaz se está usando flask, para iniciar la aplicación se hace:
+ 
  cd frontend
  
  flask run
