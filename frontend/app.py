@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request
-from frontend.recuperacion import retrieve_text
+from recuperacion import retrieve_text
 
 app = Flask(__name__)
 
