@@ -5,4 +5,4 @@
  
  flask run
 
-El archivo csvs.py crea el índice invertido y guarda los elementos necesarios para la comparación por método de cosenos.
+El archivo csvs.py crea el índice invertido y guarda los elementos necesarios para la comparación por método de cosenos. Los csv's resultantes se tienen que pasar al directorio frontend para que funcione.
