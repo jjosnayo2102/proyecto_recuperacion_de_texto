@@ -10,7 +10,7 @@ def index():
         query_text = request.form['query_text']
         k = int(request.form['k'])
         method = request.form['method']
-        if method == 'custom':
+        if method == 'propia':
             results = recuperacion(query_text, k)
         elif method == 'postgresql':
             results = recuperacion_postgresql(query_text, k)
