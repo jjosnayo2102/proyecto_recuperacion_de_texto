@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DatafusionDB - Recuperación de texto</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        .lyric-cell {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 300px;
+            cursor: pointer;
+        }
+
+        .lyric-cell.expanded {
+            white-space: normal;
+            max-width: none;
+        }
+        
+        .results-table {
+            table-layout: fixed;
+            width: 100%;
+        }
+
+        /* Ajustes para poder hacer scroll si es necesario */
+        body {
+            overflow-y: auto;
+        }
+
+        /* Opción de estilo para alinear y ajustar la tabla si es necesario */
+        .results-table td {
+            padding: 10px;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            margin-top: 20px;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>DatafusionDB - Sistema de recuperación de texto</h1>
+        <form method="POST" class="search-form">
+            <label for="query_text">Ingrese texto:</label><br>
+            <textarea id="query_text" name="query_text" placeholder="Enter your query here..."></textarea><br><br>
+
+            <label for="k">Top k elementos:</label><br>
+            <input type="number" id="k" name="k" min="1" value="5"><br><br>
+
+            <label for="method">Elegir método:</label><br>
+            <select id="method" name="method">
+                <option value="propia">Implementación propia</option>
+                <option value="postgresql">PostgreSQL</option>
+            </select><br><br>
+
+            <button type="submit" class="btn">Buscar</button>
+        </form>
+
+        {% if results %}
+            <h2>Top {{ results|length }} Resultados</h2>
+            <table class="results-table">
+                <thead>
+                    <tr>
+                        <th>Titulo</th>
+                        <th>Puntaje</th>
+                        <th>Autor</th>
+                        <th>Letra</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for result in results %}
+                        <tr>
+                            <td>{{ result.titulo }}</td>
+                            <td>{{ result.puntaje }}</td>
+                            <td>{{ result.autor }}</td>
+                            <td class="lyric-cell" data-lyrics="{{ result.letra }}">
+                                {{ result.letra[:50] }}...{{ result.letra[-50:] }}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+        
+        <!-- Botón de regreso al menú siempre visible -->
+        <a href="{{ url_for('home') }}" class="btn">Regresar al Menú</a>
+    </div>
+
+    <script>
+        // Cuando se hace clic en una celda de la columna "Letra"
+        document.querySelectorAll('.lyric-cell').forEach(function(cell) {
+            cell.onclick = function() {
+                var isExpanded = this.classList.contains('expanded');
+                if (!isExpanded) {
+                    // Expandir celda para mostrar el texto completo
+                    var fullLyrics = this.getAttribute('data-lyrics');
+                    this.textContent = fullLyrics;
+                    this.classList.add('expanded');
+                } else {
+                    // Contraer celda para mostrar el texto truncado nuevamente
+                    var truncatedLyrics = this.getAttribute('data-lyrics');
+                    this.textContent = truncatedLyrics.slice(0, 50) + '...' + truncatedLyrics.slice(-50);
+                    this.classList.remove('expanded');
+                }
+            };
+        });
+    </script>
+</body>
+</html>
+
+
