@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DatafusionDB - Home</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>DatafusionDB - Sistema de Recuperación</h1>
+        <p>Seleccione el tipo de recuperación:</p>
+        <div class="options">
+            <a href="{{ url_for('text_retrieval') }}" class="btn">Recuperación de Texto</a>
+            <a href="{{ url_for('image_retrieval') }}" class="btn">Recuperación de Imágenes</a>
+        </div>
+    </div>
+</body>
+</html>

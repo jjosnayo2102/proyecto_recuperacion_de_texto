@@ -33,6 +33,22 @@
         .results-table td {
             padding: 10px;
         }
+        
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            margin-top: 20px;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            background-color: #0056b3;
+        }
     </style>
 </head>
 <body>
@@ -71,7 +87,6 @@
                             <td>{{ result.titulo }}</td>
                             <td>{{ result.puntaje }}</td>
                             <td>{{ result.autor }}</td>
-                            <!-- Texto truncado con puntos suspensivos -->
                             <td class="lyric-cell" data-lyrics="{{ result.letra }}">
                                 {{ result.letra[:50] }}...{{ result.letra[-50:] }}
                             </td>
@@ -80,6 +95,9 @@
                 </tbody>
             </table>
         {% endif %}
+        
+        <!-- Botón de regreso al menú siempre visible -->
+        <a href="{{ url_for('home') }}" class="btn">Regresar al Menú</a>
     </div>
 
     <script>
@@ -103,3 +121,4 @@
     </script>
 </body>
 </html>
+

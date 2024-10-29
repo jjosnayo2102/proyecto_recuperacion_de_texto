@@ -4,6 +4,7 @@ from nltk.stem.snowball import SnowballStemmer
 import pickle
 from collections import defaultdict, Counter
 import pandas as pd
+import shelve
 
 # nltk.download('punkt')
 import re
@@ -14,14 +15,10 @@ with open("stoplist.txt", encoding="latin1") as file:
 def preprocesamiento(texto):
   if not texto or pd.isnull(texto):
         return []
-  # convertir a minúsculas y eliminar signos
   texto = texto.lower()
   texto = re.sub(r"[^\w\s]", "", texto)
-  # tokenizar
-  tokens = nltk.word_tokenize(texto, language='english')
-  # filtrar stopwords
+  tokens = nltk.word_tokenize(texto, language='english') # la mayoría de canciones está en inglés
   words = [word for word in tokens if word not in stoplist]
-  # reducir palabras
   words = [stemmer.stem(word) for word in words]
   return words
 
@@ -29,59 +26,71 @@ class InvertIndex:
     def __init__(self, index_file):
         self.index_file = index_file
         self.index = defaultdict(list)
-        self.idf = {}
-        self.length = {}
+        self.idf = defaultdict(float)
+        self.length = defaultdict(float)
 
-    def building(self, database, position_text):
-        doc_count = database.shape[0]
-        doc_terms = defaultdict(Counter)
-        for i, doc in enumerate(database.itertuples(index=False), 1):
-            doc_id = i
-            words = preprocesamiento(getattr(doc, position_text))
-            doc_terms[doc_id] = Counter(words)
-            for word in set(words):
-                self.index[word].append((doc_id, math.log10(doc_terms[doc_id][word] + 1)))
-        for word in self.index:
-            df = len(self.index[word])
-            self.idf[word] = math.log10(doc_count / df)
-        for doc_id, terms in doc_terms.items():
-            norm = 0
-            for word, tf in terms.items():
-                weight = tf * self.idf[word]
-                norm += weight ** 2
-            self.length[doc_id] = math.sqrt(norm)
-        with open(self.index_file, 'wb') as f:
-            pickle.dump((self.index, self.idf, self.length), f)
+    def building(self, database_name, position_text):
+        #spimi
+        n = 0
+        N = 0
+        for database in pd.read_csv(database_name,chunksize=100): # leer por partes
+            doc_count = database.shape[0]
+            doc_terms = defaultdict(Counter)
+            coleccion = database[position_text]
+            for i, letra in enumerate(coleccion):
+                doc_id = i+1
+                words = preprocesamiento(letra)
+                doc_terms[doc_id] = Counter(words)
+                for word in set(words):
+                    self.index[word].append((doc_id, math.log10(doc_terms[doc_id][word] + 1)))
+            N += doc_count
+            for word in self.index:
+                df = len(self.index[word])
+                self.idf[word] += df # primero se guardan df's
+            # ir metiendo los terminos de los indices locales en sus postings lists
+            with shelve.open(self.index_file + "_postings_list") as pl:
+                for term in self.index:
+                    if term not in pl:
+                        pl[term] = []
+                    pl[term].extend(self.index[term])
+            self.index = defaultdict(list)
+            n += 1
+        # crear el idf
+        for key in self.idf:
+            self.idf[key] = math.log10(N / self.idf[key])
+        # crear el length de cada documento usando memoria secundaria
+        with shelve.open(self.index_file + "_postings_list") as indice:
+            for term in self.idf:
+                postingslist = indice[term]
+                for p in postingslist:
+                    self.length[p[0]] += self.idf[term]*p[1]
+        with open(self.index_file + ".dat", "wb") as file:
+            pickle.dump((self.idf,self.length), file)
+
 
     def load_index(self):
-        with open(self.index_file, 'rb') as f:
-            self.index, self.idf, self.length = pickle.load(f)
+        with open(self.index_file + ".dat", 'rb') as f:
+            self.idf, self.length = pickle.load(f)
 
     def retrieval(self, query, k):
-        query_terms = preprocesamiento(query)
-        query_weights = defaultdict(float)
-        norm_query = 0
-        for term in query_terms:
+        query_terms = Counter(preprocesamiento(query))
+        scores = defaultdict(float)
+        query_norm = 0
+        for term, tf in query_terms.items():
             if term in self.idf:
-                tf = math.log10(query_terms.count(term) + 1)
-                query_weights[term] = tf * self.idf[term]
-                norm_query += (tf * self.idf[term]) ** 2
-        norm_query = math.sqrt(norm_query)
-        doc_scores = defaultdict(float)
-        for term, weight_query in query_weights.items():
-            if term in self.index:
-                for doc_id, weight_doc in self.index[term]:
-                    doc_scores[doc_id] += weight_query * weight_doc
-        for doc_id in doc_scores:
-            if self.length[doc_id] > 0:
-                doc_scores[doc_id] /= (self.length[doc_id] * norm_query)
-                doc_scores[doc_id] = round(doc_scores[doc_id], 4)
-        ranked_docs = sorted(doc_scores.items(), key=lambda x: x[1], reverse=True)[:k]
-        return ranked_docs
+                w_t_q = math.log10(tf + 1) * self.idf[term]
+                query_norm += w_t_q ** 2
+                with shelve.open(self.index_file + "_postings_list") as indice:
+                    postingslist = indice[term]
+                    for doc_id, tf_t_d in postingslist:
+                        w_t_d = tf_t_d * self.idf[term]
+                        scores[doc_id] += w_t_d * w_t_q 
+        query_norm = math.sqrt(query_norm)
+        for doc_id in scores:
+            scores[doc_id] /= (self.length[doc_id]*query_norm)
+        top_k = sorted(scores.items(), key=lambda x: x[1], reverse=True)[:k]
+        return top_k
 
-# df = pd.read_csv('spotify_songs.csv')
-# index = InvertIndex("indice.dat")
-# index.building(df, 'lyrics')
 
-# Agregar memoria secundaria en el building
-# Obtener índice de memoria secundaria
+# index = InvertIndex("indice")
+# index.building('spotify_songs.csv', 'lyrics')
