@@ -1,6 +1,6 @@
-from fetch_en_ram import InvertIndex, pd
+from fetch import InvertIndex, pd
 
-indice = InvertIndex("indice_prueba.dat")
+indice = InvertIndex("indice.dat")
 indice.load_index()
 df = pd.read_csv("spotify_songs.csv")
 contenido = df[["track_name", "track_artist", "lyrics"]]

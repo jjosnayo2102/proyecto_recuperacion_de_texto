@@ -6,19 +6,22 @@
     <title>DatafusionDB - Recuperación de Imágenes</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <style>
-        /* Estilos para la tabla de resultados */
-        .results-table {
-            width: 100%;
-            border-collapse: collapse;
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 20px;
         }
-        .results-table th, .results-table td {
-            padding: 10px;
+        .result-item {
             text-align: center;
-            border: 1px solid #ddd;
         }
-        .image-result {
-            max-width: 150px; /* Ancho máximo de las imágenes */
-            max-height: 150px; /* Alto máximo de las imágenes */
+        .result-item img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }
+        .result-item h3 {
+            margin-top: 8px;
+            font-size: 16px;
         }
         .upload-btn {
             display: inline-block;
@@ -32,9 +35,8 @@
             margin-bottom: 20px;
         }
         input[type="file"] {
-            display: none; /* Ocultar el input de archivo */
+            display: none;
         }
-        
         .btn {
             display: inline-block;
             padding: 10px 20px;
@@ -46,7 +48,6 @@
             margin-top: 20px;
             text-decoration: none;
         }
-
         .btn:hover {
             background-color: #0056b3;
         }
@@ -58,39 +59,27 @@
         <form method="POST" class="search-form" enctype="multipart/form-data">
             <label for="query_image" class="upload-btn">Cargar Imagen</label>
             <input type="file" id="query_image" name="query_image" accept="image/*" required><br><br>
-
             <label for="k">Top k elementos:</label><br>
             <input type="number" id="k" name="k" min="1" value="5" required><br><br>
-
             <button type="submit" class="btn">Buscar</button>
         </form>
 
         {% if results %}
             <h2>Top {{ results|length }} Resultados</h2>
-            <table class="results-table">
-                <thead>
-                    <tr>
-                        <th>Imagen</th>
-                        <th>Título</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for result in results %}
-                        <tr>
-                            <td>
-                                <img src="{{ result.image_url }}" alt="{{ result.title }}" class="image-result">
-                            </td>
-                            <td>{{ result.title }}</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+            <div class="results-grid">
+                {% for result in results %}
+                    <div class="result-item">
+                        <img src="{{ result.image_url }}" alt="{{ result.title }}" class="image-result">
+                        <h3>{{ result.title }}</h3>
+                    </div>
+                {% endfor %}
+            </div>
         {% endif %}
         
-        <!-- Botón de regreso al menú siempre visible -->
         <a href="{{ url_for('home') }}" class="btn">Regresar al Menú</a>
     </div>
 </body>
 </html>
+
 
 

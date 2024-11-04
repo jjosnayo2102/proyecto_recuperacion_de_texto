@@ -6,7 +6,7 @@ from collections import defaultdict, Counter
 import pandas as pd
 import re
 
-nltk.download('punkt')
+# nltk.download('punkt')
 stemmer = SnowballStemmer('english')
 
 with open("stoplist.txt", encoding="latin1") as file:
@@ -30,19 +30,18 @@ class InvertIndex:
         self.length = defaultdict(float)
 
     def building(self, database_name, position_text):
-        N = 0  # Contador total de documentos
-        for database in pd.read_csv(database_name, chunksize=100):
-            doc_count = database.shape[0]
-            N += doc_count
-            coleccion = database[position_text]
-            for doc_id, doc in enumerate(coleccion):
-                terms = preprocesamiento(doc)
-                doc_frec = Counter(terms)
-                for term, frec in doc_frec.items():
-                    self.index[term].append((doc_id, math.log10(1 + frec)))
-                    self.idf[term] += 1
+        database = pd.read_csv(database_name)
+        N = database.shape[0]
+        coleccion = database[position_text]
+        for doc_id, doc in enumerate(coleccion):
+            id = doc_id + 1
+            terms = preprocesamiento(doc)
+            doc_frec = Counter(terms)
+            for term, frec in doc_frec.items():
+                self.index[term].append((id, math.log10(1 + frec)))
+                self.idf[term] += 1
         for t in self.idf:
-            self.idf[t] = N/self.idf[t]
+            self.idf[t] = math.log10(N/self.idf[t])
         for term, pl in self.index.items():
             for doc_id,tf in pl:
                 self.length[doc_id] += (self.idf[term]*tf)**2
@@ -73,5 +72,5 @@ class InvertIndex:
         return top_k
 
 
-index = InvertIndex("indice.dat")
-index.building('spotify_songs.csv', 'lyrics')
+# index = InvertIndex("indice_prueba.dat")
+# index.building('spotify_songs.csv', 'lyrics')
