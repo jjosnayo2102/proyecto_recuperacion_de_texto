@@ -72,5 +72,5 @@ class InvertIndex:
         return top_k
 
 
-# index = InvertIndex("indice_prueba.dat")
+# index = InvertIndex("indice.dat")
 # index.building('spotify_songs.csv', 'lyrics')
