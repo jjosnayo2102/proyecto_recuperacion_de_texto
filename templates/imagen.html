@@ -8,7 +8,7 @@
     <style>
         .results-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            grid-template-columns: repeat(4, 1fr);  /* 4 imágenes por fila */
             gap: 20px;
         }
         .result-item {
@@ -69,17 +69,18 @@
             <div class="results-grid">
                 {% for result in results %}
                     <div class="result-item">
-                        <img src="{{ result.image_url }}" alt="{{ result.title }}" class="image-result">
-                        <h3>{{ result.title }}</h3>
+                        <img src="{{ result.url }}" alt="{{ result.titulo }}" class="image-result">
+                        <h3>{{ result.titulo }}</h3>
                     </div>
                 {% endfor %}
             </div>
         {% endif %}
-        
+
         <a href="{{ url_for('home') }}" class="btn">Regresar al Menú</a>
     </div>
 </body>
 </html>
+
 
 
 

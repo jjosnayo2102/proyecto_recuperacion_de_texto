@@ -1,9 +1,10 @@
 from flask import Flask, render_template, request, url_for
-from retrieval import recuperacion
-from retrieval_postgresql import recuperacion_postgresql
-# Importa la función para recuperación de imágenes, si ya la tienes
-# from retrieval_images import recuperacion_imagenes
+from texto.fetch import default_value
+from texto.retrieval import recuperacion
+from texto.retrieval_postgresql import recuperacion_postgresql
+# from imagen.retrieval_image_rtree import recuperacion_imagenes_rtree
 import time
+from PIL import Image
 
 app = Flask(__name__)
 
@@ -23,7 +24,6 @@ def text_retrieval():
             final = time.time()
             tiempo_propio = round((final - inicio)*1000,4)
             print(f"Tiempo de ejecución: {tiempo_propio} ms")
-            # results = [{"titulo": "temporal", "puntaje": -1, "autor": "temporal", "letra": "temporal"}]
         elif method == 'postgresql':
             inicio = time.time()
             results = recuperacion_postgresql(query_text, k)
@@ -38,12 +38,12 @@ def image_retrieval():
     if request.method == 'POST':
         query_image = request.files['query_image']
         k = int(request.form['k'])
-        # Supón que tienes una función llamada `recuperacion_imagenes`
-        # results = recuperacion_imagenes(query_image, k)
-        # Aquí solo es un ejemplo, adapta `results` a tu implementación de recuperación de imágenes
-        results = [
-            {'image_url': url_for('static', filename='images/37861420_p0.jpg'), 'title': 'ttgl'},
-        ]
+        image = Image.open(query_image)
+        # results = recuperacion_imagenes_rtree(image, k)
+        results = [{"titulo": "15970.jpg", "url": "http://assets.myntassets.com/v1/images/style/properties/7a5b82d1372a7a5c6de67ae7a314fd91_images.jpg"},
+                   {"titulo": "39386.jpg", "url": "http://assets.myntassets.com/v1/images/style/properties/4850873d0c417e6480a26059f83aac29_images.jpg"},
+                   {"titulo": "59263.jpg", "url": "http://assets.myntassets.com/v1/images/style/properties/Titan-Women-Silver-Watch_b4ef04538840c0020e4829ecc042ead1_images.jpg"}
+                   ,{"titulo": "21379.jpg", "url": "http://assets.myntassets.com/v1/images/style/properties/8153dc35d9a5420eeb93922067137db6_images.jpg"}]
         return render_template('imagen.html', results=results)
     return render_template('imagen.html', results=None)
 
