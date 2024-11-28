@@ -59,8 +59,17 @@
         <form method="POST" class="search-form" enctype="multipart/form-data">
             <label for="query_image" class="upload-btn">Cargar Imagen</label>
             <input type="file" id="query_image" name="query_image" accept="image/*" required><br><br>
+            
             <label for="k">Top k elementos:</label><br>
             <input type="number" id="k" name="k" min="1" value="5" required><br><br>
+
+            <label for="method">Elegir método:</label><br>
+            <select id="method" name="method">
+                <option value="secuencial">Secuencial</option>
+                <option value="rtree">Rtree</option>
+                <option value="faiss">Faiss</option>
+            </select><br><br>
+
             <button type="submit" class="btn">Buscar</button>
         </form>
 
@@ -80,6 +89,7 @@
     </div>
 </body>
 </html>
+
 
 
 

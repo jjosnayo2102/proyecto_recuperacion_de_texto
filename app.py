@@ -2,7 +2,8 @@ from flask import Flask, render_template, request, url_for
 from texto.fetch import default_value
 from texto.retrieval import recuperacion
 from texto.retrieval_postgresql import recuperacion_postgresql
-# from imagen.retrieval_image_rtree import recuperacion_imagenes_rtree
+from imagen.retrieval_image_rtree import recuperacion_imagenes_rtree
+from imagen.retrieval_image_sec import recuperacion_imagenes_sec
 import time
 from PIL import Image
 
@@ -39,11 +40,17 @@ def image_retrieval():
         query_image = request.files['query_image']
         k = int(request.form['k'])
         image = Image.open(query_image)
-        # results = recuperacion_imagenes_rtree(image, k)
+        method = request.form['method']
+        if method == "rtree":
+            results = recuperacion_imagenes_rtree(image, k)
+        if method == "secuencial":
+            results = recuperacion_imagenes_sec(image,k)
+        '''
         results = [{"titulo": "15970.jpg", "url": "http://assets.myntassets.com/v1/images/style/properties/7a5b82d1372a7a5c6de67ae7a314fd91_images.jpg"},
                    {"titulo": "39386.jpg", "url": "http://assets.myntassets.com/v1/images/style/properties/4850873d0c417e6480a26059f83aac29_images.jpg"},
                    {"titulo": "59263.jpg", "url": "http://assets.myntassets.com/v1/images/style/properties/Titan-Women-Silver-Watch_b4ef04538840c0020e4829ecc042ead1_images.jpg"}
                    ,{"titulo": "21379.jpg", "url": "http://assets.myntassets.com/v1/images/style/properties/8153dc35d9a5420eeb93922067137db6_images.jpg"}]
+        '''
         return render_template('imagen.html', results=results)
     return render_template('imagen.html', results=None)
 

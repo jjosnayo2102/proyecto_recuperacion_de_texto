@@ -1,4 +1,5 @@
-import pandas as pd
+import pickle
 
-df2 = pd.read_csv("styles.csv")
-print(df2.head())
+with open("index_image_sec.dat","rb") as file:
+    bd = pickle.load(file)
+print(len(bd))     
