@@ -35,7 +35,7 @@ bd = []
 # Procesar las imágenes
 for index, row in df.iterrows(): # cuenta desde 0 sin contar header
     url = row['link']
-    if index == 100:
+    if index == 1000:
         break
     # extraer solo algunas caracteristicas
     descriptors = select_top_sift_features(url)

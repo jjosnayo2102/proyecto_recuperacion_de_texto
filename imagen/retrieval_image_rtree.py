@@ -12,7 +12,7 @@ df = pd.read_csv('imagen/images.csv')
 prop = rtree.index.Property()
 prop.dimension = 128
 prop.buffering_capacity = 64
-idx = rtree.index.Index("rtree", properties=prop)
+idx = rtree.index.Index("rtree_1000", properties=prop)
 
 def preprocesar_imagen(url_image):
     # Convertir la imagen a un arreglo NumPy (compatible con OpenCV)

@@ -9,7 +9,7 @@ import numpy as np
 prop = rtree.index.Property()
 prop.dimension = 128
 prop.buffering_capacity = 64
-idx = rtree.index.Index("rtree", properties=prop)
+idx = rtree.index.Index("rtree_1000", properties=prop)
 
 # Inicializar el detector SIFT
 sift = cv2.SIFT_create()

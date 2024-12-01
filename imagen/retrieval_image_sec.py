@@ -52,7 +52,7 @@ def preprocesar_imagen(url_image):
     selected_descriptors = np.array([pair[1] for pair in selected_pairs])
     return selected_descriptors
 
-with open("index_image_sec.dat", "rb") as file:
+with open("index_image_sec_1000.dat", "rb") as file:
     bd = pickle.load(file)
 
 df = pd.read_csv("imagen/images.csv")
@@ -62,6 +62,7 @@ def recuperacion_imagenes_sec(query_image, k):
     res_parciales = []
     for query_vector in vectores:
         coleccion = []
+        # mejorar
         for descriptor in bd:
             nearest_i = knnsecundario(query_vector, descriptor) # se usa la matriz descriptor de cada imagen como una colección
             # se obtiene el descriptor mas cercano a la característica de la inmagen
