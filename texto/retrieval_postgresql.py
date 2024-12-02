@@ -4,9 +4,9 @@ import re
 def conectar():
     coneccion = psycopg2.connect(
         host="localhost",
-        database="postgres",
+        database="proyecto2db2",
         user="postgres",
-        password="j73987927j",
+        password="",
         port="5432"
         )
     return coneccion.cursor()

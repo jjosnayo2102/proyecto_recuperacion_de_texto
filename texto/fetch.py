@@ -7,7 +7,7 @@ import pandas as pd
 import re
 import os
 
-# nltk.download('punkt')
+#nltk.download('punkt_tab')
 stemmer = SnowballStemmer('english')
 
 with open("texto/stoplist.txt", encoding="latin1") as file:
@@ -39,7 +39,7 @@ class InvertIndex:
 
     def building(self, database_name, position_text):
         N = 0
-        for bloque in pd.read_csv(database_name, chunksize=1000):
+        for bloque in pd.read_csv(database_name, chunksize=1000, nrows=2000, header=0):
             N += bloque.shape[0]
             coleccion = bloque[position_text]
             for doc_id, doc in enumerate(coleccion):
@@ -135,5 +135,5 @@ class InvertIndex:
         return top_k
 
 
-# index = InvertIndex("indice")
-# index.building('spotify_songs.csv', 'lyrics')
+#index = InvertIndex("indice")
+#index.building('spotify_songs.csv', 'lyrics')
