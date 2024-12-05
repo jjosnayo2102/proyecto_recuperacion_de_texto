@@ -8,6 +8,10 @@ python app.py
 
 ## Recuperación de texto:
 
+![Comparación de métodos en texto](comparacion_metodos_texto.png)
+
 ## Recuperación de imágenes:
+
+![Comparación de métodos en imágenes](comparacion_metodos_imagenes.png)
 
 
